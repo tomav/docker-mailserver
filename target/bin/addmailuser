@@ -15,9 +15,12 @@ function __usage
     addmailuser - add an email address (i.e. a user)
 
 \e[38;5;214mSYNOPSIS\e[39m
-    ./setup.sh email add <EMAIL ADDRESS> [<PASSWORD>]
+    ./setup.sh email add [-g] <EMAIL ADDRESS> [<PASSWORD>]
 
 \e[38;5;214mOPTIONS\e[39m
+    -g
+        Also generate user encryption key and password protect it with doveadm mailbox cryptokey generate
+
     \e[94mGeneric Program Information\e[39m
         help       Print the usage information.
 
@@ -35,9 +38,21 @@ function __usage
 
 [[ ${1:-} == 'help' ]] && { __usage ; exit 0 ; }
 
+while getopts "g" OPT
+do
+  case ${OPT} in
+    g ) CRYPTOKEY_GENERATE=true ;;
+    * )
+      echo "Invalid option: -${OPT}" >&2
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
 FULL_EMAIL="${1}"
 shift
 PASSWD="${*}"
+CRYPTOKEY_GENERATE="${CRYPTOKEY_GENERATE:-false}"
 
 [[ -z ${FULL_EMAIL} ]] && { __usage ; errex 'No username specified' ; }
 [[ "${FULL_EMAIL}" =~ .*\@.* ]] || { __usage ; errex 'Username must include the domain' ; }
@@ -72,4 +87,10 @@ then
     echo "Waiting for dovecot to create /var/mail/${DOMAIN}/${USER}..."
     sleep 1
   done
+fi
+
+# Only necessary when user encryption keys are enabled
+if "${CRYPTOKEY_GENERATE}"
+then
+  doveadm -o plugin/mail_crypt_private_password="${PASSWD}" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
 fi

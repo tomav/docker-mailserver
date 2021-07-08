@@ -10,25 +10,57 @@
 
 DATABASE=${DATABASE:-/tmp/docker-mailserver/postfix-accounts.cf}
 
-USER="${1}"
+CRYPTOKEY_UPDATE_PASSWORD=false
+CRYPTOKEY_GENERATE=false
+
+while getopts "cg" OPT
+do
+  case ${OPT} in
+    c ) CRYPTOKEY_UPDATE_PASSWORD="${3}" ;;
+    g ) CRYPTOKEY_GENERATE=true ;;
+    * )
+      echo "Invalid option: -${OPT}" >&2
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+FULL_EMAIL="${1}"
 shift
 PASSWD="${*}"
 
-function usage  {	echo "Usage: updatemailuser <user@domain.tld> [password]" ; }
+function usage  {	echo "Usage: updatemailuser [-g] [-c] <EMAIL ADDRESS> [<PASSWORD>] [<OLD CRYPTOKEY PASSWORD>]" ; }
 
-[[ -z ${USER} ]] && { usage ; errex "no username specified" ; }
+[[ -z ${FULL_EMAIL} ]] && { usage ; errex "no username specified" ; }
 
 if [[ -z ${PASSWD} ]]
 then
   read -r -s -p "Enter Password: " PASSWD
   echo
-  [[ -z ${PASSWD} ]] && errex "Password must not be empty"
+  [[ -z ${PASSWD} ]] && errex "password must not be empty"
 fi
 
-HASH="$(doveadm pw -s SHA512-CRYPT -u "${USER}" -p "${PASSWD}")"
+HASH="$(doveadm pw -s SHA512-CRYPT -u "${FULL_EMAIL}" -p "${PASSWD}")"
 
 # Protect config file with lock to avoid race conditions
 touch "${DATABASE}"
 create_lock "$(basename "$0")"
-grep -qi "^$(escape "${USER}")|" "${DATABASE}" 2>/dev/null || errex "User \"${USER}\" does not exist"
-sed -i "s ^""${USER}""|.* ""${USER}""|""${HASH}"" " "${DATABASE}"
+grep -qi "^$(escape "${FULL_EMAIL}")|" "${DATABASE}" 2>/dev/null || errex "user \"${FULL_EMAIL}\" does not exist"
+sed -i "s ^""${FULL_EMAIL}""|.* ""${FULL_EMAIL}""|""${HASH}"" " "${DATABASE}"
+
+# Only necessary when FULL_EMAIL encryption keys are enabled
+if [[ "${CRYPTOKEY_UPDATE_PASSWORD}" != false ]]
+then
+    if [[ -z ${CRYPTOKEY_UPDATE_PASSWORD} ]]
+    then
+      read -r -s -p "Enter Old CryptoKey Password: " CRYPTOKEY_UPDATE_PASSWORD
+      echo
+      [[ -z ${CRYPTOKEY_UPDATE_PASSWORD} ]] && errex "password must not be empty"
+    fi
+    doveadm mailbox cryptokey password -u "${FULL_EMAIL}" -n "${PASSWD}" -o "${CRYPTOKEY_UPDATE_PASSWORD}"
+fi
+
+if "${CRYPTOKEY_GENERATE}"
+then
+  doveadm -o plugin/mail_crypt_private_password="${PASSWD}" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
+fi

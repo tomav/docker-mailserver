@@ -169,11 +169,19 @@ ${ORANGE}OPTIONS${RESET}
 
 ${RED}[${ORANGE}SUB${RED}]${ORANGE}COMMANDS${RESET}
     ${LBLUE}COMMAND${RESET} email ${RED}:=${RESET}
-        ${0} email ${CYAN}add${RESET} <EMAIL ADDRESS> [<PASSWORD>]
-        ${0} email ${CYAN}update${RESET} <EMAIL ADDRESS> [<PASSWORD>]
-        ${0} email ${CYAN}del${RESET} [ OPTIONS${RED}...${RESET} ] <EMAIL ADDRESS> [ <EMAIL ADDRESS>${RED}...${RESET} ]
+        ${0} email ${CYAN}add${RESET} [-g] <EMAIL ADDRESS> [<PASSWORD>]
+        ${0} email ${CYAN}update${RESET} [-g] [-c] <EMAIL ADDRESS> [<PASSWORD>] [<OLD CRYPTOKEY PASSWORD>]
+        ${0} email ${CYAN}del${RESET} OPTIONS${RED}...${RESET} ] <EMAIL ADDRESS> [ <EMAIL ADDRESS>${RED}...${RESET} ]
         ${0} email ${CYAN}restrict${RESET} <add${RED}|${RESET}del${RED}|${RESET}list> <send${RED}|${RESET}receive> [<EMAIL ADDRESS>]
         ${0} email ${CYAN}list${RESET}
+
+        ${ORANGE}OPTIONS${RESET}
+            ${LBLUE}User Encryption Keys${RESET}
+                -g
+                    Generate encryption keys for specific user
+
+                -c
+                    Update user's password and also update, using the same password, the user's encryption key
 
     ${LBLUE}COMMAND${RESET} alias ${RED}:=${RESET}
         ${0} alias ${CYAN}add${RESET} <EMAIL ADDRESS> <RECIPIENT>
