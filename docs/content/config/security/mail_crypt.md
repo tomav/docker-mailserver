@@ -16,7 +16,9 @@ title: 'Security | mail_crypt (email/storage encryption)'
     It's best to choose ONE of the options below early on and carefully, then stick with it. There is no guarantee that switching from Global to User keys will be easy and not result in losing emails.
 
 
-Official Dovecot documentation: https://doc.dovecot.org/configuration_manual/mail_crypt_plugin/
+!!! seealso
+
+   [Official Dovecot documentation](https://doc.dovecot.org/configuration_manual/mail_crypt_plugin/)
 
 ---
 
