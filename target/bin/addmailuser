@@ -15,11 +15,11 @@ function __usage
     addmailuser - add an email address (i.e. a user)
 
 \e[38;5;214mSYNOPSIS\e[39m
-    ./setup.sh email add [-g] <EMAIL ADDRESS> [<PASSWORD>]
+    ./setup.sh email add [ OPTIONS ] <EMAIL ADDRESS> [<PASSWORD>]
 
 \e[38;5;214mOPTIONS\e[39m
     -g
-        Also generate user encryption key and password protect it with doveadm mailbox cryptokey generate
+        Also generate user encryption key and password protect it with current password
 
     \e[94mGeneric Program Information\e[39m
         help       Print the usage information.

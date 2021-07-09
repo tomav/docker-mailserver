@@ -13,12 +13,48 @@ DATABASE=${DATABASE:-/tmp/docker-mailserver/postfix-accounts.cf}
 CRYPTOKEY_UPDATE_PASSWORD=false
 CRYPTOKEY_GENERATE=false
 
-while getopts "cg" OPT
+function usage
+{
+  echo -e "\e[35mUPDATEMAILUSER\e[31m(\e[93m8\e[31m)
+
+\e[38;5;214mNAME\e[39m
+    updatemailuser - allows user to update an existing email user
+
+\e[38;5;214mSYNOPSIS\e[39m
+    updatemailuser [ OPTIONS ] <EMAIL ADDRESS> [<PASSWORD>] [<OLD CRYPTOKEY PASSWORD>\e[31m...\e[39m] \e[31m|\e[39m help]
+
+\e[38;5;214mOPTIONS\e[39m
+    -g
+        Generate encryption keys for specific user
+
+    -c
+        Update user's password and also update, using the same password, the user's encryption key
+
+    -h
+        Show this help dialogue.
+
+\e[38;5;214mEXIT STATUS\e[39m
+    Exit status is 0 if command was successful, and 1 if there was an error.
+"
+}
+
+if [[ ${1} == 'help' ]]
+then
+  __usage
+  exit 0
+fi
+
+while getopts "cgh" OPT
 do
   case ${OPT} in
     c ) CRYPTOKEY_UPDATE_PASSWORD="${3}" ;;
     g ) CRYPTOKEY_GENERATE=true ;;
+    h )
+      __usage
+      exit 0
+      ;;
     * )
+      __usage
       echo "Invalid option: -${OPT}" >&2
       ;;
   esac
@@ -29,7 +65,6 @@ FULL_EMAIL="${1}"
 shift
 PASSWD="${*}"
 
-function usage  {	echo "Usage: updatemailuser [-g] [-c] <EMAIL ADDRESS> [<PASSWORD>] [<OLD CRYPTOKEY PASSWORD>]" ; }
 
 [[ -z ${FULL_EMAIL} ]] && { usage ; errex "no username specified" ; }
 

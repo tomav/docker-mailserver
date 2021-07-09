@@ -18,7 +18,7 @@ title: 'Security | mail_crypt (email/storage encryption)'
 
 !!! seealso
 
-   [Official Dovecot documentation](https://doc.dovecot.org/configuration_manual/mail_crypt_plugin/)
+    [Official Dovecot documentation](https://doc.dovecot.org/configuration_manual/mail_crypt_plugin/)
 
 ---
 
