@@ -1,0 +1,88 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "eleith",
+      "name": "eleith",
+      "avatar_url": "https://avatars.githubusercontent.com/u/284832?v=4",
+      "profile": "http://eleith.com",
+      "contributions": [
+        "infra",
+        "doc"
+      ]
+    },
+    {
+      "login": "NorseGaud",
+      "name": "Nathan Pierce",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5896030?v=4",
+      "profile": "https://github.com/NorseGaud",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "georglauterbach",
+      "name": "Georg Lauterbach",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44545919?v=4",
+      "profile": "https://github.com/georglauterbach",
+      "contributions": [
+        "maintenance",
+        "code",
+        "question",
+        "review"
+      ]
+    },
+    {
+      "login": "hnws",
+      "name": "hnws",
+      "avatar_url": "https://avatars.githubusercontent.com/u/668137?v=4",
+      "profile": "https://github.com/hnws",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "wernerfred",
+      "name": "Frederic Werner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20406381?v=4",
+      "profile": "https://github.com/wernerfred",
+      "contributions": [
+        "doc",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "casperklein",
+      "name": "Casper",
+      "avatar_url": "https://avatars.githubusercontent.com/u/590174?v=4",
+      "profile": "https://www.heiko-barth.de",
+      "contributions": [
+        "maintenance"
+      ]
+    },
+    {
+      "login": "polarathene",
+      "name": "Brennan Kinney",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5098581?v=4",
+      "profile": "https://github.com/polarathene",
+      "contributions": [
+        "maintenance",
+        "doc",
+        "security",
+        "question"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "badgeTemplate": "",
+  "projectName": "docker-mailserver",
+  "projectOwner": "docker-mailserver",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": false,
+  "commitConvention": "none"
+}
