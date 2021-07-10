@@ -65,8 +65,17 @@ title: 'Security | mail_crypt (email/storage encryption)'
 
 6. Start the container, monitor the logs for any errors, send yourself a message, and then confirm the file on disk is encrypted:
     ```
-    [root@ip-XXXXXXXXXX ~]# cat -A /mnt/efs-us-west-2/maildata/awesomesite.com/me/cur/1623989305.M6v�z�@�� m}��,��9����B*�247.us-west-2.compute.inE��\Ck*�@7795,W=7947:2,
-    T�9�8t�6�� t���e�W��S   `�H��C�ڤ �yeY��XZ��^�d�/��+�A
+    root@ip-xxx:/# xxd /var/mail/xxx/xxx/cur/1625835047.M216159P15117.ip-xxx\,S\=80516\,W\=81800\:2\,S  | head
+    00000000: 4352 5950 5445 4403 0702 0000 0002 0000  CRYPTED.........
+    00000010: 0143 0609 6086 4801 6503 0401 2e06 0960  .C..`.H.e......`
+    00000020: 8648 0165 0304 0201 0000 0800 0000 0113  .H.e............
+    00000030: 0102 39f8 ca52 927f ff3d 5be1 0a7e 52e0  ..9..R...=[..~R.
+    00000040: 6ae0 e40e 8584 5f89 851b 076c 39c0 14ed  j....._....l9...
+    00000050: 8b21 0000 0085 0401 0288 970f d348 6460  .!...........Hd`
+    00000060: 29f7 66e4 60f7 57f3 e293 cf1e 4364 7ad7  ).f.`.W.....Cdz.
+    00000070: 7d29 0fe5 6cf7 5666 4aa1 b4c9 ddcf 650a  })..l.VfJ.....e.
+    00000080: 193b 7f31 072a 28ad d84b c038 ddd2 f060  .;.1.*(..K.8...`
+    00000090: 9931 7282 4d4e dd51 e101 9406 d4fc e3d0  .1r.MN.Q........
     ```
 
 This should be the minimum required for encryption of the mail while in storage.
@@ -133,6 +142,15 @@ This should be the minimum required for encryption of the mail while in storage.
 
 6. Start the container, monitor the logs for any errors, send yourself a message, and then confirm the file on disk is encrypted (existing emails are not encrypted):
     ```
-    [root@ip-XXXXXXXXXX ~]# cat -A /mnt/efs-us-west-2/maildata/awesomesite.com/me/cur/1623989305.M6v�z�@�� m}��,��9����B*�247.us-west-2.compute.inE��\Ck*�@7795,W=7947:2,
-    T�9�8t�6�� t���e�W��S   `�H��C�ڤ �yeY��XZ��^�d�/��+�A
+    root@ip-xxx:/# xxd /var/mail/xxx/xxx/cur/1625835047.M216159P15117.ip-xxx\,S\=80516\,W\=81800\:2\,S  | head
+    00000000: 4352 5950 5445 4403 0702 0000 0002 0000  CRYPTED.........
+    00000010: 0143 0609 6086 4801 6503 0401 2e06 0960  .C..`.H.e......`
+    00000020: 8648 0165 0304 0201 0000 0800 0000 0113  .H.e............
+    00000030: 0102 39f8 ca52 927f ff3d 5be1 0a7e 52e0  ..9..R...=[..~R.
+    00000040: 6ae0 e40e 8584 5f89 851b 076c 39c0 14ed  j....._....l9...
+    00000050: 8b21 0000 0085 0401 0288 970f d348 6460  .!...........Hd`
+    00000060: 29f7 66e4 60f7 57f3 e293 cf1e 4364 7ad7  ).f.`.W.....Cdz.
+    00000070: 7d29 0fe5 6cf7 5666 4aa1 b4c9 ddcf 650a  })..l.VfJ.....e.
+    00000080: 193b 7f31 072a 28ad d84b c038 ddd2 f060  .;.1.*(..K.8...`
+    00000090: 9931 7282 4d4e dd51 e101 9406 d4fc e3d0  .1r.MN.Q........
     ```
