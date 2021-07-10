@@ -79,8 +79,6 @@ This should be the minimum required for encryption of the mail while in storage.
     ```
     mail_attribute_dict = file:%h/Maildir/dovecot-attributes
     mail_plugins = $mail_plugins mail_crypt
-    mail_debug= yes
-
     plugin {
       mail_crypt_curve = secp521r1
       mail_crypt_save_version = 2
