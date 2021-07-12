@@ -10,6 +10,7 @@
 
 DATABASE=${DATABASE:-/tmp/docker-mailserver/postfix-accounts.cf}
 
+MAIL_CRYPT_ENABLED=false
 CRYPTOKEY_UPDATE_PASSWORD=false
 CRYPTOKEY_GENERATE=false
 
@@ -44,11 +45,29 @@ then
   exit 0
 fi
 
+# Ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
+if grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/*
+then
+  MAIL_CRYPT_ENABLED=true
+else
+  echo "No mail_crypt plugin found! Enable to add/update user enryption key password..."
+fi
+
 while getopts "cgh" OPT
 do
   case ${OPT} in
-    c ) CRYPTOKEY_UPDATE_PASSWORD="${3}" ;;
-    g ) CRYPTOKEY_GENERATE=true ;;
+    c )
+      if [[ "${MAIL_CRYPT_ENABLED}" == true ]]
+      then
+        CRYPTOKEY_UPDATE_PASSWORD="${3}"
+      fi
+      ;;
+    g )
+      if [[ "${MAIL_CRYPT_ENABLED}" == true ]]
+      then
+        CRYPTOKEY_GENERATE=true
+      fi
+      ;;
     h )
       __usage
       exit 0
