@@ -6,7 +6,7 @@
 passdb {
   driver = passwd-file
   args = scheme=CRYPT username_format=%u /etc/dovecot/userdb
-  override_fields = userdb_mail_crypt_private_password=%w userdb_mail_crypt_save_version=2
+  override_fields = userdb_mail_crypt_private_password=%{sha256:password} userdb_mail_crypt_save_version=2
 }
 
 userdb {

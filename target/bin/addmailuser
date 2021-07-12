@@ -92,5 +92,5 @@ fi
 # Only necessary when user encryption keys are enabled
 if "${CRYPTOKEY_GENERATE}"
 then
-  doveadm -o plugin/mail_crypt_private_password="${PASSWD}" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
+  doveadm -o plugin/mail_crypt_private_password="$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
 fi

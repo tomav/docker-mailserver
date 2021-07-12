@@ -92,10 +92,10 @@ then
       echo
       [[ -z ${CRYPTOKEY_UPDATE_PASSWORD} ]] && errex "password must not be empty"
     fi
-    doveadm mailbox cryptokey password -u "${FULL_EMAIL}" -n "${PASSWD}" -o "${CRYPTOKEY_UPDATE_PASSWORD}"
+    doveadm mailbox cryptokey password -u "${FULL_EMAIL}" -n "$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" -o "$(echo -n "${CRYPTOKEY_UPDATE_PASSWORD}" | sha256sum)"
 fi
 
 if "${CRYPTOKEY_GENERATE}"
 then
-  doveadm -o plugin/mail_crypt_private_password="${PASSWD}" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
+  doveadm -o plugin/mail_crypt_private_password="$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
 fi
