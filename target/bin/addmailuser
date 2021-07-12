@@ -101,6 +101,11 @@ fi
 # Only necessary when user encryption keys are enabled
 if "${CRYPTOKEY_GENERATE}"
 then
+  while [[ $(stat -c '%U' "/var/mail/${DOMAIN}/${USER}") != docker ]]
+  do
+    echo "Waiting for proper owner to be set on /var/mail/${DOMAIN}/${USER}..."
+    sleep 1
+  done
   doveadm -o plugin/mail_crypt_private_password="$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
 fi
 
