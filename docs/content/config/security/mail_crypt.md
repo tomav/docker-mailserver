@@ -86,7 +86,7 @@ This should be the minimum required for encryption of the mail while in storage.
 1. Create `10-custom.conf` and populate it with the following:
 
     ```
-    mail_attribute_dict = file:%h/Maildir/dovecot-attributes
+    mail_attribute_dict = file:%h/dovecot/.attr
     mail_plugins = $mail_plugins mail_crypt
     plugin {
       mail_crypt_curve = secp521r1
@@ -98,15 +98,10 @@ This should be the minimum required for encryption of the mail while in storage.
 2. Create `auth-passwdfile.inc` and populate it with the following:
 
     ```
-    # Authentication for passwd-file users. Included from 10-auth.conf.
-    #
-    # passwd-like file with specified location.
-    # <doc/wiki/AuthDatabase.PasswdFile.txt>
-
     passdb {
       driver = passwd-file
       args = scheme=CRYPT username_format=%u /etc/dovecot/userdb
-      override_fields = userdb_mail_crypt_private_password=%w userdb_mail_crypt_save_version=2
+      override_fields = userdb_mail_crypt_private_password=%{sha256:password} userdb_mail_crypt_save_version=2
     }
 
     userdb {
