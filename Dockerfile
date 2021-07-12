@@ -44,16 +44,21 @@ RUN \
   apt-get -qq update && \
   apt-get -qq install apt-utils 2>/dev/null && \
   apt-get -qq dist-upgrade && \
-  apt-get -qq install postfix && \
+  apt-get -qq install postfix curl gnupg  && \
+  # Uncomment to intall latest dovecot 2.3.X
+  # curl https://repo.dovecot.org/DOVECOT-REPO-GPG | gpg --import && \
+  # gpg --export ED409DA1 > /etc/apt/trusted.gpg.d/dovecot.gpg && \
+  # echo 'deb https://repo.dovecot.org/ce-2.3-latest/debian/buster buster main' > /etc/apt/sources.list.d/dovecot.list && \
+  # apt-get -qq update && \
   apt-get -qq --no-install-recommends install \
   # A - D
   altermime amavisd-new apt-transport-https arj binutils bzip2 bsd-mailx \
-  ca-certificates cabextract clamav clamav-daemon cpio curl \
+  ca-certificates cabextract clamav clamav-daemon cpio \
   dbconfig-no-thanks dovecot-core dovecot-fts-xapian dovecot-imapd \
   dovecot-ldap dovecot-lmtpd dovecot-managesieved dovecot-pop3d \
   dovecot-sieve dovecot-solr dumb-init \
   # E - O
-  ed fetchmail file gamin gnupg gzip iproute2 iptables \
+  ed fetchmail file gamin gzip iproute2 iptables \
   locales logwatch lhasa libdate-manip-perl liblz4-tool \
   libmail-spf-perl libnet-dns-perl libsasl2-modules lrzip lzop \
   netcat-openbsd nomarch opendkim opendkim-tools opendmarc \

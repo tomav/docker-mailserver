@@ -3,8 +3,11 @@ version: '3.8'
 services:
   mailserver:
     image: docker.io/mailserver/docker-mailserver:latest
-    hostname: <HOSTNAME> # <-- CHANGE THIS
-    domainname: <DOMAINNAME> # <-- CHANGE THIS
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    hostname: mailserver # <-- CHANGE THIS
+    domainname: localhost # <-- CHANGE THIS
     container_name: mailserver
     env_file: mailserver.env
     # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
@@ -22,6 +25,9 @@ services:
       - ./data/maillogs:/var/log/mail
       - /etc/localtime:/etc/localtime:ro
       - ./config/:/tmp/docker-mailserver/
+      # Enable per user encryption keys
+      # - ./config/10-custom.conf:/etc/dovecot/conf.d/10-custom.conf:ro
+      # - ./config/auth-passwdfile.inc:/etc/dovecot/conf.d/auth-passwdfile.inc:ro
     restart: always
     stop_grace_period: 1m
     cap_add: [ "NET_ADMIN", "SYS_PTRACE" ]

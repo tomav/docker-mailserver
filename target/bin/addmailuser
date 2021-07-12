@@ -1,5 +1,4 @@
 #! /bin/bash
-
 # shellcheck disable=SC2094
 
 # shellcheck source=../scripts/helper-functions.sh
@@ -15,9 +14,12 @@ function __usage
     addmailuser - add an email address (i.e. a user)
 
 \e[38;5;214mSYNOPSIS\e[39m
-    ./setup.sh email add <EMAIL ADDRESS> [<PASSWORD>]
+    ./setup.sh email add [ OPTIONS ] <EMAIL ADDRESS> [<PASSWORD>]
 
 \e[38;5;214mOPTIONS\e[39m
+    -g
+        Also generate user encryption key and password protect it with current password (requires mail_crypt plugin to be enabled)
+
     \e[94mGeneric Program Information\e[39m
         help       Print the usage information.
 
@@ -35,9 +37,28 @@ function __usage
 
 [[ ${1:-} == 'help' ]] && { __usage ; exit 0 ; }
 
+while getopts "g" OPT
+do
+  case ${OPT} in
+    g )
+      if pgrep -f "/usr/sbin/dovecot" &>/dev/null && grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* &>/dev/null # Ensure dovcot is running and also ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
+      then
+        CRYPTOKEY_GENERATE=true
+      else
+        echo "Warning: Dovecot not running and/or no mail_crypt plugin found! Unable to generate user enryption key with password..."
+      fi
+      ;;
+    * )
+      echo "Invalid option: -${OPT}" >&2
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
 FULL_EMAIL="${1}"
 shift
 PASSWD="${*}"
+CRYPTOKEY_GENERATE="${CRYPTOKEY_GENERATE:-false}"
 
 [[ -z ${FULL_EMAIL} ]] && { __usage ; errex 'No username specified' ; }
 [[ "${FULL_EMAIL}" =~ .*\@.* ]] || { __usage ; errex 'Username must include the domain' ; }
@@ -65,11 +86,27 @@ USER="${FULL_EMAIL%@*}"
 DOMAIN="${FULL_EMAIL#*@}"
 
 # Tests fail if the creation of /var/mail/${DOMAIN}/${USER} doesn't happen fast enough after addmailuser executes (check-for-changes.sh race-condition)
-if [[ -e "/tmp/docker-mailserver-config-chksum" ]] # Prevent infinite loop in tests like "checking accounts: user3 should have been added to /tmp/docker-mailserver/postfix-accounts.cf even when that file does not exist"
+if pgrep -f "check-for-changes.sh" &>/dev/null # Handle mailserver first boots that throw "Unless using LDAP, you need at least 1 email account to start Dovecot." and don't start check-for-changes.sh
 then
-  while [[ ! -d "/var/mail/${DOMAIN}/${USER}" ]]
+  if [[ -e "/tmp/docker-mailserver-config-chksum" ]] # Prevent infinite loop in tests like "checking accounts: user3 should have been added to /tmp/docker-mailserver/postfix-accounts.cf even when that file does not exist"
+  then
+    while [[ ! -d "/var/mail/${DOMAIN}/${USER}" ]]
+    do
+      echo "Waiting for dovecot to create /var/mail/${DOMAIN}/${USER}..."
+      sleep 1
+    done
+  fi
+fi
+
+# Only necessary when user encryption keys are enabled
+if "${CRYPTOKEY_GENERATE}"
+then
+  while [[ $(stat -c '%U' "/var/mail/${DOMAIN}/${USER}") != docker ]]
   do
-    echo "Waiting for dovecot to create /var/mail/${DOMAIN}/${USER}..."
+    echo "Waiting for proper owner to be set on /var/mail/${DOMAIN}/${USER}..."
     sleep 1
   done
+  doveadm -o plugin/mail_crypt_private_password="$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
 fi
+
+echo "Successfully created ${FULL_EMAIL}"

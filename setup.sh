@@ -169,8 +169,8 @@ ${ORANGE}OPTIONS${RESET}
 
 ${RED}[${ORANGE}SUB${RED}]${ORANGE}COMMANDS${RESET}
     ${LBLUE}COMMAND${RESET} email ${RED}:=${RESET}
-        ${0} email ${CYAN}add${RESET} <EMAIL ADDRESS> [<PASSWORD>]
-        ${0} email ${CYAN}update${RESET} <EMAIL ADDRESS> [<PASSWORD>]
+        ${0} email ${CYAN}add${RESET} [ OPTIONS${RED}...${RESET} ] <EMAIL ADDRESS> [<PASSWORD>]
+        ${0} email ${CYAN}update${RESET} [ OPTIONS${RED}...${RESET} ] <EMAIL ADDRESS> [<PASSWORD>] [ <OLD CRYPTOKEY PASSWORD>${RED}...${RESET} ]
         ${0} email ${CYAN}del${RESET} [ OPTIONS${RED}...${RESET} ] <EMAIL ADDRESS> [ <EMAIL ADDRESS>${RED}...${RESET} ]
         ${0} email ${CYAN}restrict${RESET} <add${RED}|${RESET}del${RED}|${RESET}list> <send${RED}|${RESET}receive> [<EMAIL ADDRESS>]
         ${0} email ${CYAN}list${RESET}
@@ -231,7 +231,7 @@ function _docker_image
   if ${USE_CONTAINER}
   then
     # reuse existing container specified on command line
-    ${CRI} exec "${USE_TTY}" "${CONTAINER_NAME}" "${@:+$@}"
+    _docker_container "${@:+$@}"
   else
     # start temporary container with specified image
     if ! _docker_image_exists "${IMAGE_NAME}"
@@ -346,8 +346,8 @@ function _main
 
     email )
       case ${2:-} in
-        add      ) shift 2 ; _docker_image addmailuser "${@:+$@}" ;;
-        update   ) shift 2 ; _docker_image updatemailuser "${@:+$@}" ;;
+        add      ) shift 2 ; _docker_container addmailuser "${@:+$@}" ;;
+        update   ) shift 2 ; _docker_container updatemailuser "${@:+$@}" ;;
         del      ) shift 2 ; _docker_container delmailuser "${@:+$@}" ;;
         restrict ) shift 2 ; _docker_container restrict-access "${@:+$@}" ;;
         list     ) _docker_container listmailuser ;;

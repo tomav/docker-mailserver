@@ -10,25 +10,111 @@
 
 DATABASE=${DATABASE:-/tmp/docker-mailserver/postfix-accounts.cf}
 
-USER="${1}"
+MAIL_CRYPT_ENABLED=false
+CRYPTOKEY_UPDATE_PASSWORD=false
+CRYPTOKEY_GENERATE=false
+
+function usage
+{
+  echo -e "\e[35mUPDATEMAILUSER\e[31m(\e[93m8\e[31m)
+
+\e[38;5;214mNAME\e[39m
+    updatemailuser - allows user to update an existing email user
+
+\e[38;5;214mSYNOPSIS\e[39m
+    updatemailuser [ OPTIONS ] <EMAIL ADDRESS> [<PASSWORD>] [<OLD CRYPTOKEY PASSWORD>\e[31m...\e[39m] \e[31m|\e[39m help]
+
+\e[38;5;214mOPTIONS\e[39m
+    -g
+        Generate encryption keys for specific user
+
+    -c
+        Update user's password and also update, using the same password, the user's encryption key
+
+    -h
+        Show this help dialogue.
+
+\e[38;5;214mEXIT STATUS\e[39m
+    Exit status is 0 if command was successful, and 1 if there was an error.
+"
+}
+
+if [[ ${1} == 'help' ]]
+then
+  __usage
+  exit 0
+fi
+
+# Ensure dovcot is running and also ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
+if pgrep -f "/usr/sbin/dovecot" &>/dev/null && grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* &>/dev/null
+then
+  MAIL_CRYPT_ENABLED=true
+else
+  echo "Warning: Dovecot not running and/or no mail_crypt plugin found! Unable to generate user enryption key with password..."
+fi
+
+while getopts "cgh" OPT
+do
+  case ${OPT} in
+    c )
+      if [[ "${MAIL_CRYPT_ENABLED}" == true ]]
+      then
+        CRYPTOKEY_UPDATE_PASSWORD="${3}"
+      fi
+      ;;
+    g )
+      if [[ "${MAIL_CRYPT_ENABLED}" == true ]]
+      then
+        CRYPTOKEY_GENERATE=true
+      fi
+      ;;
+    h )
+      __usage
+      exit 0
+      ;;
+    * )
+      __usage
+      echo "Invalid option: -${OPT}" >&2
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+FULL_EMAIL="${1}"
 shift
 PASSWD="${*}"
 
-function usage  {	echo "Usage: updatemailuser <user@domain.tld> [password]" ; }
 
-[[ -z ${USER} ]] && { usage ; errex "no username specified" ; }
+[[ -z ${FULL_EMAIL} ]] && { usage ; errex "no username specified" ; }
 
 if [[ -z ${PASSWD} ]]
 then
   read -r -s -p "Enter Password: " PASSWD
   echo
-  [[ -z ${PASSWD} ]] && errex "Password must not be empty"
+  [[ -z ${PASSWD} ]] && errex "password must not be empty"
 fi
 
-HASH="$(doveadm pw -s SHA512-CRYPT -u "${USER}" -p "${PASSWD}")"
+HASH="$(doveadm pw -s SHA512-CRYPT -u "${FULL_EMAIL}" -p "${PASSWD}")"
 
 # Protect config file with lock to avoid race conditions
 touch "${DATABASE}"
 create_lock "$(basename "$0")"
-grep -qi "^$(escape "${USER}")|" "${DATABASE}" 2>/dev/null || errex "User \"${USER}\" does not exist"
-sed -i "s ^""${USER}""|.* ""${USER}""|""${HASH}"" " "${DATABASE}"
+grep -qi "^$(escape "${FULL_EMAIL}")|" "${DATABASE}" 2>/dev/null || errex "user \"${FULL_EMAIL}\" does not exist"
+sed -i "s ^""${FULL_EMAIL}""|.* ""${FULL_EMAIL}""|""${HASH}"" " "${DATABASE}"
+
+# Only necessary when FULL_EMAIL encryption keys are enabled
+if [[ "${CRYPTOKEY_UPDATE_PASSWORD}" != false ]]
+then
+    if [[ -z ${CRYPTOKEY_UPDATE_PASSWORD} ]]
+    then
+      read -r -s -p "Enter Old CryptoKey Password: " CRYPTOKEY_UPDATE_PASSWORD
+      echo
+      [[ -z ${CRYPTOKEY_UPDATE_PASSWORD} ]] && errex "password must not be empty"
+    fi
+    doveadm mailbox cryptokey password -u "${FULL_EMAIL}" -n "$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" -o "$(echo -n "${CRYPTOKEY_UPDATE_PASSWORD}" | sha256sum)"
+fi
+
+if "${CRYPTOKEY_GENERATE}"
+then
+  doveadm -o plugin/mail_crypt_private_password="$(echo -n "${PASSWD}" | sha256sum | awk '{print $1}')" mailbox cryptokey generate -u "${FULL_EMAIL}" -U
+fi
