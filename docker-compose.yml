@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   mailserver:
-    # image: docker.io/mailserver/docker-mailserver:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: docker.io/mailserver/docker-mailserver:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     hostname: mailserver # <-- CHANGE THIS
     domainname: localhost # <-- CHANGE THIS
     container_name: mailserver

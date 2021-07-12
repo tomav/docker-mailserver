@@ -41,11 +41,11 @@ while getopts "g" OPT
 do
   case ${OPT} in
     g )
-      if grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* # Ensure it's enabled, else doveadm will fail to find mailbox cryptokey commands
+      if pgrep -f "/usr/sbin/dovecot" &>/dev/null && grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* &>/dev/null # Ensure dovecot is running && ensure mail_crypt it's enabled, else doveadm will fail to find mailbox cryptokey commands
       then
         CRYPTOKEY_GENERATE=true
       else
-        echo "Warning: No mail_crypt plugin found! Unable to generate user enryption key with password..."
+        echo "Warning: Dovecot not running and/or no mail_crypt plugin found! Unable to generate user enryption key with password..."
       fi
       ;;
     * )

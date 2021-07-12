@@ -46,11 +46,11 @@ then
 fi
 
 # Ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
-if grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/*
+if pgrep -f "/usr/sbin/dovecot" &>/dev/null && grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* &>/dev/null
 then
   MAIL_CRYPT_ENABLED=true
 else
-  echo "No mail_crypt plugin found! Enable to add/update user enryption key password..."
+  echo "Warning: Dovecot not running and/or no mail_crypt plugin found! Unable to generate user enryption key with password..."
 fi
 
 while getopts "cgh" OPT
