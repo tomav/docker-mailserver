@@ -45,7 +45,7 @@ then
   exit 0
 fi
 
-# Ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
+# Ensure dovcot is running and also ensure mail_crypt is enabled, else doveadm will fail to find mailbox cryptokey commands
 if pgrep -f "/usr/sbin/dovecot" &>/dev/null && grep "mail_plugins.*mail_crypt" /etc/dovecot/conf.d/* &>/dev/null
 then
   MAIL_CRYPT_ENABLED=true
